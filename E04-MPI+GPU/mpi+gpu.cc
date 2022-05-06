@@ -37,23 +37,20 @@ int main() {
 
     at::ScalarType dtype = mpiToATDtypeMap.at(MPI_FLOAT);
     auto options = at::TensorOptions().dtype(dtype).device(at::kCUDA);
-    at::Tensor inpTensorDevice = at::ones({shape, shape}, options) * localRank;
+    at::Tensor tensorDevice = at::ones({shape, shape}, options) * localRank;
 
-    options = at::TensorOptions().dtype(dtype).device(at::kCPU);
-    at::Tensor outTensorHost = at::zeros({shape, shape}, options);
-
-    auto inpTensorHost = inpTensorDevice.cpu();
+    auto tensorHost = tensorDevice.cpu();
     // output atomicity ignored
     printf("Global Rank: %d/%d, Local Rank: %d, Tensor:\n", worldRank, worldSize, localRank);
-    std::cout << inpTensorHost << std::endl;
+    std::cout << tensorHost << std::endl;
 
-    // auto outTensorHost = inpTensorHost.data_ptr();
-    auto placeholder = outTensorHost.data_ptr();
-    MPI_Allreduce(&inpTensorHost, placeholder, shape * shape, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+    auto tensorPtr = tensorHost.data_ptr();
+    MPI_Allreduce(MPI_IN_PLACE, tensorPtr, shape * shape, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+    // output atomicity ignored
     printf("Global Rank: %d/%d, Local Rank: %d, AR Tensor:\n", worldRank, worldSize, localRank);
-    std::cout << outTensorHost << std::endl;
+    std::cout << tensorHost << std::endl;
 
-    // auto outTensorDevice = outTensorHost.cuda();
+    tensorDevice = tensorHost.cuda();
 
     MPI_Finalize();
     return 0;
