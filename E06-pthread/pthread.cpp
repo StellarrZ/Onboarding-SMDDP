@@ -11,6 +11,7 @@ void hello() {
     semPtr1->p();
     cout << "Hello " << flush;
     semPtr2->v();
+
     semPtr1->p();
     cout << "Hello " << flush;
     semPtr2->v();
@@ -20,6 +21,7 @@ void world() {
     semPtr2->p();
     cout << "World" << endl;
     semPtr1->v();
+    
     semPtr2->p();
     cout << "World" << endl;
     semPtr1->v();
