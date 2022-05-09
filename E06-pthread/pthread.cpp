@@ -7,32 +7,34 @@ using namespace std;
 
 my::mySemaphore *semPtr1, *semPtr2;
 
-void hello() {
-    semPtr1->p();
-    cout << "Hello " << flush;
-    semPtr2->v();
-
+inline void print_Hello() {
     semPtr1->p();
     cout << "Hello " << flush;
     semPtr2->v();
 }
 
-void world() {
+inline void print_Wolrd() {
     semPtr2->p();
     cout << "World" << endl;
     semPtr1->v();
-    
-    semPtr2->p();
-    cout << "World" << endl;
-    semPtr1->v();
+}
+
+void func_Hello() {
+    print_Hello();
+    print_Hello();
+}
+
+void func_World() {
+    print_Wolrd();
+    print_Wolrd();
 }
 
 int main(int argc, char** argv) {
     semPtr1 = new my::mySemaphore(1);
     semPtr2 = new my::mySemaphore();
 
-    thread tHello(hello);
-    thread tWorld(world);
+    thread tHello(func_Hello);
+    thread tWorld(func_World);
     
     tHello.join();
     tWorld.join();

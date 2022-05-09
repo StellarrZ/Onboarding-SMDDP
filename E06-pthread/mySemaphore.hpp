@@ -25,7 +25,7 @@ namespace my {
 
         void v() {
             std::lock_guard<std::mutex> lock(_mtx);
-            if (++_cnt <= 0) {
+            if (++_cnt >= 0) {
                 _condiVar.notify_one();
             }
         }
