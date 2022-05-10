@@ -24,8 +24,8 @@ inline __m256i initPackedRandInts_8() {
 }
 
 inline __m256i initPackedRandInts_8(const int *buf) {
-    // __m256i arr = _mm256_loadu_epi32(buf);      // CPUID Flags: AVX512F + AVX512VL
-    __m256i arr = _mm256_set_epi32(buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
+    __m256i arr = _mm256_loadu_si256((const __m256i_u *)buf);
+    // __m256i arr = _mm256_set_epi32(buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
     return _mm256_and_si256(mask, arr);
 }
 
