@@ -41,6 +41,12 @@ class Net(nn.Module):
         return output
 
 
+def grad_AR(model):
+    for param in model.parameters():
+        dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
+        param.grad.data /= dist.get_world_size()
+
+
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -49,6 +55,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
         output = model(data)
         loss = F.nll_loss(output, target)
         loss.backward()
+        grad_AR(model)
         optimizer.step()
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
@@ -144,7 +151,7 @@ def main():
     train_sampler = DistributedSampler(train_set, num_replicas=size, rank=rank)
     train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=False, pin_memory=True, sampler=train_sampler)
     if rank == 0:
-        test_loader = DataLoader(test_set, batch_size=args.test_batch_size, shuffle=True)
+        test_loader = DataLoader(test_set, batch_size=args.test_batch_size, shuffle=False)
 
     model = Net().to(device)
     torch.cuda.set_device(rank)
