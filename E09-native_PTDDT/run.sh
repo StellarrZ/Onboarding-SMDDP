@@ -1,0 +1,1 @@
+torchrun --nnodes 1 --nproc_per_node 8 main.py --save-model --epochs 10 | tee out.txt
