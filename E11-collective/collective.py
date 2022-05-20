@@ -8,13 +8,12 @@ LOG_PATH = os.path.join(os.getcwd(), "logs")
 
 
 
-def test_resuelt(result):
+def test_resuelt(result, method="Unknown"):
     answer = torch.tensor(range(TENSOR_LEN), dtype=dtype).to(device) * (size - 1) * size // 2
     ruler = torch.tensor([True] * TENSOR_LEN).to(device)
     assert torch.sum(torch.logical_xor(ruler, result == answer)) == 0
     with open(log_dir, 'a') as fh:
-        fh.write("Result Test Passed. Rank %d/%d\n" %(rank, size))
-    # print("Result Test Passed. Rank %d/%d" %(rank, size))
+        fh.write("Method %s -- Result Test Passed. Rank %d/%d\n" %(method, rank, size))
 
 
 def sharing_all_to_all(inp):
@@ -30,10 +29,41 @@ def sharing_all_to_all(inp):
     return ret
 
 
+def run_aggregator(inp):
+    if rank == ROOT:
+        commList = [i for i in range(size) if i != ROOT]
+        bufferList = [torch.zeros(TENSOR_LEN, dtype=dtype).to(device) for _ in range(len(commList))]
+        ret = inp.clone()
+        handleList = []
+        for i, src in enumerate(commList):
+            handleList.append(dist.irecv(bufferList[i], src))
+        for i, handle in enumerate(handleList):
+            handle.wait()
+            ret += bufferList[i]
+
+        handleList = []
+        for dst in commList:
+            handleList.append(dist.isend(ret, dst))
+        for handle in handleList:
+            handle.wait()
+    else:
+        handle = dist.isend(inp, ROOT)
+        ret = torch.zeros(TENSOR_LEN, dtype=dtype).to(device)
+        handle.wait()
+        dist.recv(ret, ROOT)
+    
+    return ret
+
+
 def main():
     inp = torch.tensor(range(TENSOR_LEN), dtype=dtype).to(device) * rank
+
     out = sharing_all_to_all(inp)
-    test_resuelt(out)
+    test_resuelt(out, method="sharing_all_to_all")
+
+    out = run_aggregator(inp)
+    test_resuelt(out, method="aggregator")
+
 
 
 if __name__ == '__main__':

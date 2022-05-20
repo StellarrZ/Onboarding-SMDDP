@@ -1,8 +1,16 @@
-Result Test Passed. Rank 0/8
-Result Test Passed. Rank 1/8
-Result Test Passed. Rank 2/8
-Result Test Passed. Rank 3/8
-Result Test Passed. Rank 4/8
-Result Test Passed. Rank 5/8
-Result Test Passed. Rank 6/8
-Result Test Passed. Rank 7/8
+Method sharing_all_to_all -- Result Test Passed. Rank 0/8
+Method sharing_all_to_all -- Result Test Passed. Rank 1/8
+Method sharing_all_to_all -- Result Test Passed. Rank 2/8
+Method sharing_all_to_all -- Result Test Passed. Rank 3/8
+Method sharing_all_to_all -- Result Test Passed. Rank 4/8
+Method sharing_all_to_all -- Result Test Passed. Rank 5/8
+Method sharing_all_to_all -- Result Test Passed. Rank 7/8
+Method sharing_all_to_all -- Result Test Passed. Rank 6/8
+Method aggregator -- Result Test Passed. Rank 7/8
+Method aggregator -- Result Test Passed. Rank 6/8
+Method aggregator -- Result Test Passed. Rank 5/8
+Method aggregator -- Result Test Passed. Rank 1/8
+Method aggregator -- Result Test Passed. Rank 4/8
+Method aggregator -- Result Test Passed. Rank 3/8
+Method aggregator -- Result Test Passed. Rank 0/8
+Method aggregator -- Result Test Passed. Rank 2/8
